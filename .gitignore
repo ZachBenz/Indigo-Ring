@@ -1,2 +1,4 @@
 Ring.indigoPlugin/Contents/Server Plugin/Ring.py
 TestData/*
+.idea/*
+.DS_Store
