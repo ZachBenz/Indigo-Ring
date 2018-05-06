@@ -449,3 +449,22 @@ class Plugin(indigo.PluginBase):
 		
 		#Perform the work
 		self.Ring.downloadVideo(dev, filename, eventId)
+
+	def _grabStillImage(self, pluginAction):
+		self.debugLog(u"\t grabStillImage - %s" % pluginAction.pluginTypeId)
+		dev = indigo.devices[pluginAction.deviceId]
+		doorbellId = dev.pluginProps["doorbellId"]
+
+		filename = pluginAction.props.get('downloadFilePath', "")
+		eventId = dev.states["lastEventId"]
+		eventIdOption = pluginAction.props.get('eventIdOption', "lastEventId")
+		if eventIdOption == "specifyEventId":
+			eventId = pluginAction.props.get('userSpecifiedEventId', "")
+
+		# Make sure we have an event ID to process
+		if eventId == "":
+			indigo.server.log(u"No Event ID specified to download for %s" % (dev.name), isError=True)
+			return
+
+		# Perform the work
+		self.Ring.downloadVideo(dev, filename, eventId)
