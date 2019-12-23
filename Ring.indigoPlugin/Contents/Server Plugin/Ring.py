@@ -24,9 +24,8 @@ import urllib
 import urllib2
 import base64
 import uuid
-from applicationinsights import TelemetryClient
+
 AUTH_REFRESH_TIMEOUT = 86400
-TelemetryClientKey = '48d8185d-556d-4876-a6f3-ffaca58195f6'
 
 class Ring(object):
     baseUrl = 'https://api.ring.com/clients_api/'
@@ -51,21 +50,8 @@ class Ring(object):
     def __del__(self):
         pass
 
-    def startTelemetry(self):
-        self.plugin.debugLog('Starting Telemetry')
-        self.tc = TelemetryClient(TelemetryClientKey)
-        self.tc.context.device.model = 'Ring'
-        self.tc.context.application.ver = self.plugin.pluginVersion
-        self.tc.channel.sender.send_interval_in_milliseconds = 30000
-        self.tc.channel.sender.max_queue_item_count = 10
-
     def startup(self, force):
         logging.getLogger('requests').setLevel(logging.WARNING)
-        if self.plugin.pluginPrefs.get('sendTelemetry', False):
-            self.plugin.debugLog('Telemetry enabled')
-            self.startTelemetry()
-        else:
-            self.plugin.debugLog('Telemetry disabled')
         result = self.refreshAuth(force)
         return result
 
@@ -359,17 +345,7 @@ class Ring(object):
                 loopCount = loopCount + 1
 
     def logTrace(self, caller, trace):
-        if self.plugin.pluginPrefs.get('sendTelemetry', False):
-            try:
-                self.tc
-                if self.tc == None:
-                    self.startTelemetry()
-            except Exception as err:
-                self.plugin.debugLog('Failed to send telemetry: %s' % err)
-                self.startTelemetry()
-
-            self.tc.track_trace(caller, trace)
-            self.tc.flush()
+        # Removed third party telemetry integration
         return
 
     def downloadVideo(self, dev, filename, eventId):
